@@ -23,7 +23,7 @@ import { MailProcessor } from '@shared/mails/processors/mail.processor';
           },
         },
         defaults: {
-          from: `"IcodeU" <${config.get('MAIL_FROM')}>`,
+          from: `${config.get('MAIL_NAME')} <${config.get('MAIL_FROM')}>`,
         },
         preview: false,
         template: {
