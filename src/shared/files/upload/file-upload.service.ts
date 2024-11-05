@@ -1,5 +1,8 @@
-import { Upload } from '@aws-sdk/lib-storage';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import * as fs from 'fs';
 
 import {
@@ -9,17 +12,11 @@ import {
   MediaType,
 } from '@common/enums';
 import { generateFileSize } from '@common/utils';
-import { S3Service } from '@shared/s3/s3.service';
+import { CloudinaryService } from '@shared/cloudinary/cloudinary.service';
 
 @Injectable()
 export class FileUploadService {
-  private readonly bucket: string;
-  private readonly region: string;
-
-  constructor(private s3: S3Service) {
-    this.bucket = this.s3.getBucket();
-    this.region = this.s3.getRegion();
-  }
+  constructor(private cloudinaryService: CloudinaryService) {}
 
   async uploadFile(
     file: Express.Multer.File,
@@ -44,7 +41,7 @@ export class FileUploadService {
       !this.isValidDocumentCategory(category)
     ) {
       throw new BadRequestException(
-        '`Upload failed, no document with category ${category}`',
+        `Upload failed, no document with category ${category}`,
       );
     }
 
@@ -52,32 +49,20 @@ export class FileUploadService {
       type === MediaType.Business
         ? `${type}/${category}/header`
         : type === MediaType.Document
-          ? `${type}/${category}`
+          ? `${type}/${category.toLowerCase()}`
           : type === MediaType.Album
             ? `${type}/${category}/header`
             : type === MediaType.Project
               ? `business/${category}/${type}/header`
               : `${type}`;
-    const fileStream = fs.createReadStream(file.path);
-    const contentType = file.mimetype || 'application/octet-stream';
-    const fileSize = generateFileSize(file.size);
 
-    const upload = new Upload({
-      client: this.s3,
-      params: {
-        ACL: 'public-read',
-        Bucket: this.bucket,
-        Key: `${folderName}/${file.filename}`, // File path in S3
-        Body: fileStream,
-        ContentType: contentType,
-      },
-    });
+    const result = await this.cloudinaryService.uploadFile(file, folderName);
 
-    const data = await upload.done();
-
-    const objectUrl = `https://${this.bucket}.s3.${this.region}.amazonaws.com/${data.Key}`;
-
-    return { name: file.filename, url: objectUrl, size: fileSize };
+    return {
+      name: result.public_id,
+      url: result.secure_url,
+      size: generateFileSize(file.size),
+    };
   }
 
   async uploadFiles(
@@ -117,38 +102,25 @@ export class FileUploadService {
       const fileStream = fs.createReadStream(file.path);
 
       if (!fileStream) {
-        throw new Error('Failed to create file stream');
+        throw new BadRequestException('Failed to create file stream');
       }
 
-      const contentType = file.mimetype || 'application/octet-stream';
-      const fileSize = generateFileSize(file.size);
-
-      const upload = new Upload({
-        client: this.s3,
-        params: {
-          ACL: 'public-read',
-          Bucket: this.bucket,
-          Key: `${folderName}/${file.filename}`,
-          Body: fileStream,
-          ContentType: contentType,
-        },
-        tags: [],
-        queueSize: 4,
-        partSize: 1024 * 1024 * 5,
-        leavePartsOnError: false,
-      });
-
       try {
-        const data = await upload.done();
-        const objectUrl = `https://${this.bucket}.s3.${this.region}.amazonaws.com/${data.Key}`;
+        const result = await this.cloudinaryService.uploadFile(
+          file,
+          folderName,
+        );
+
         uploadedFiles.push({
-          name: file.filename,
-          url: objectUrl,
-          size: fileSize,
+          name: result.public_id,
+          url: result.secure_url,
+          size: generateFileSize(file.size),
         });
       } catch (error) {
         console.error({ error });
-        throw new Error(`Failed to upload file: ${error.message}`);
+        throw new InternalServerErrorException(
+          `Failed to upload file: ${error.message}`,
+        );
       } finally {
         fs.unlinkSync(file.path);
       }

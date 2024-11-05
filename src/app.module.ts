@@ -4,8 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from '@src/app.controller';
 import { AppService } from '@src/app.service';
 import { AppConfig } from '@config/app.config';
+import { CloudinaryModule } from '@shared/cloudinary/cloudinary.module';
 import { PrismaModule } from '@shared/prisma/prisma.module';
-import { S3Module } from '@shared/s3/s3.module';
 import { FileUploadModule } from '@shared/files/upload/file-upload.module';
 import { FileDownloadModule } from '@shared/files/download/file-download.module';
 import { QueuesModule } from '@shared/queues/queues.module';
@@ -26,8 +26,8 @@ import { SearchModule } from '@modules/search/search.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    CloudinaryModule,
     PrismaModule,
-    S3Module,
     FileUploadModule,
     FileDownloadModule,
     QueuesModule,
