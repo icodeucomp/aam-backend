@@ -11,7 +11,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "node dist/src/main",
     "start:dev": "nest start --watch",
     "start:dev-lint": "npm run lint && npm run format && nest start --watch",
     "start:debug": "nest start --debug --watch",
