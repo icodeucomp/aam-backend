@@ -1,3 +1,4 @@
+export const cloudinaryRootFolder = 'amanah-aulia-mandiri';
 export const defaultPage = '1';
 export const defaultLimitPageData = '9';
 export const maxDocumentSize: number = 20 * 1024 * 1024;
