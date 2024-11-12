@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 async function main() {
   const totalBusinessItem: number = 5;
 
-  const documentCategories = ['legality', 'certification', 'award'];
+  const documentCategories = ['Legality', 'Certification', 'Award'];
 
   const businessData = [
     {
@@ -16,12 +16,12 @@ async function main() {
       slug: BusinessSlug.CivilConstruction,
       description: "This is description for business 'civil & construction'",
       header: {
-        slug: 'civil-construction-business-header',
-        url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        slug: `${BusinessSlug.CivilConstruction}-business-header`,
+        url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       },
       productHeader: {
-        slug: 'civil-construction-business-product-header',
-        url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        slug: `${BusinessSlug.CivilConstruction}-business-product-header`,
+        url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       },
     },
     {
@@ -29,12 +29,12 @@ async function main() {
       slug: BusinessSlug.Electrical,
       description: "This is description for business 'electrical'",
       header: {
-        slug: 'electrical-business-header',
-        url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        slug: `${BusinessSlug.Electrical}-business-header`,
+        url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       },
       productHeader: {
-        slug: 'electrical-business-product-header',
-        url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        slug: `${BusinessSlug.Electrical}-business-product-header`,
+        url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       },
     },
     {
@@ -42,25 +42,25 @@ async function main() {
       slug: BusinessSlug.Fabrication,
       description: "This is description for business 'fabrication'",
       header: {
-        slug: 'fabrication-business-header',
-        url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        slug: `${BusinessSlug.Fabrication}-business-header`,
+        url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       },
       productHeader: {
-        slug: 'fabrication-business-product-header',
-        url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        slug: `${BusinessSlug.Fabrication}-business-product-header`,
+        url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       },
     },
     {
       title: 'General Supplier',
-      slug: BusinessSlug.General_supplier,
+      slug: BusinessSlug.GeneralSupplier,
       description: "This is description for business 'general supplier'",
       header: {
-        slug: 'general-supplier-business-header',
-        url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        slug: `${BusinessSlug.GeneralSupplier}-business-header`,
+        url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       },
       productHeader: {
-        slug: 'general-supplier-business-product-header',
-        url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        slug: `${BusinessSlug.GeneralSupplier}-business-product-header`,
+        url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       },
     },
     {
@@ -68,12 +68,12 @@ async function main() {
       slug: BusinessSlug.Machining,
       description: "This is description for business 'machining'",
       header: {
-        slug: 'machining-business-header',
-        url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        slug: `${BusinessSlug.Machining}-business-header`,
+        url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       },
       productHeader: {
-        slug: 'machining-business-product-header',
-        url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        slug: `${BusinessSlug.Machining}-business-product-header`,
+        url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       },
     },
     {
@@ -81,12 +81,12 @@ async function main() {
       slug: BusinessSlug.Mechanical,
       description: "This is description for business 'mechanical'",
       header: {
-        slug: 'mechanical-business-header',
-        url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        slug: `${BusinessSlug.Mechanical}-business-header`,
+        url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       },
       productHeader: {
-        slug: 'mechanical-business-product-header',
-        url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        slug: `${BusinessSlug.Mechanical}-business-product-header`,
+        url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       },
     },
   ];
@@ -108,7 +108,7 @@ async function main() {
       name: `Company Album`,
       slug: generateSlug('Company Album'),
       header:
-        'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       creatorId: 1,
     },
   });
@@ -120,7 +120,7 @@ async function main() {
       name: `Project Album`,
       slug: generateSlug('Project Album'),
       header:
-        'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+        'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
       creatorId: 1,
     },
   });
@@ -148,7 +148,7 @@ async function main() {
         slug: generateSlug(`Blog ${i}`),
         content: `Content for blog ${i}`,
         header:
-          'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+          'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
         authorId: i,
       },
     });
@@ -161,7 +161,7 @@ async function main() {
         name: `Document ${i}`,
         slug: generateSlug(`Document ${i}`),
         category: documentCategories[index],
-        url: `https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/documents/gitkraken-git-basics-cheat-sheet-1726203463649.pdf`,
+        url: `https://res.cloudinary.com/dkyazovdn/image/upload/v1731382358/amanah-aulia-mandiri/document/default-document.pdf`,
         size: `${String(Math.floor(Math.random() * (999 - 500 + 1)) + 500)} KB`,
         uploaderId: i,
       },
@@ -173,7 +173,7 @@ async function main() {
       create: {
         name: `Media ${i}`,
         slug: generateSlug(`media ${i}`),
-        url: `https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png`,
+        url: `https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png`,
         size: `${String(Math.floor(Math.random() * (999 - 500 + 1)) + 500)} KB`,
         albumId,
         uploaderId: i,
@@ -205,15 +205,15 @@ async function main() {
           media: [
             {
               slug: `${businessData[i - 1].slug}-product-image${i}`,
-              url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+              url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
             },
             {
               slug: `${businessData[i - 1].slug}-product-image${i + 1}`,
-              url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+              url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
             },
             {
               slug: `${businessData[i - 1].slug}-product-image${i + 1}`,
-              url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+              url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
             },
           ],
           businessId: i,
@@ -230,20 +230,20 @@ async function main() {
           description: `${businessData[i - 1].title} project ${j}`,
           header: {
             slug: `${businessData[i - 1].slug}-project-${j}-header`,
-            url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+            url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
           },
           media: [
             {
               slug: `${businessData[i - 1].slug}-project-image${i}`,
-              url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+              url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
             },
             {
               slug: `${businessData[i - 1].slug}-project-image${i + 1}`,
-              url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+              url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
             },
             {
               slug: `${businessData[i - 1].slug}-project-image${i + 1}`,
-              url: 'https://icodeu-storage.s3.ap-southeast-1.amazonaws.com/images/blogs/uiux1-1726546759614.png',
+              url: 'https://res.cloudinary.com/dkyazovdn/image/upload/v1731316670/amanah-aulia-mandiri/default/default-image.png',
             },
           ],
           businessId: i,
