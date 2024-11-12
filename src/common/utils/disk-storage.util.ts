@@ -1,15 +1,12 @@
-import * as fs from 'fs';
 import { diskStorage } from 'multer';
 import * as path from 'path';
+import * as os from 'os';
 
 import { generateSlug } from './generate-slug.util';
 
 export const storage = diskStorage({
   destination: (req, file, callback) => {
-    const tmpDir = path.join(__dirname, 'tmp');
-    if (!fs.existsSync(tmpDir)) {
-      fs.mkdirSync(tmpDir);
-    }
+    const tmpDir = os.tmpdir();
     callback(null, tmpDir);
   },
   filename: (req, file, callback) => {
