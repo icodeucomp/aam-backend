@@ -1,5 +1,5 @@
 # Base image
-FROM node:20
+FROM node:20-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -7,22 +7,19 @@ WORKDIR /usr/src/app
 # Listen to all network interface
 ENV HOST=0.0.0.0
 
-# ENV DATABASE_URL=${DATABASE_URL}
-
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
 
 # Install app dependencies
 RUN npm install
 
-# Copy prisma schema and generate the client
-COPY prisma ./prisma
-RUN npx prisma generate
-
 # Bundle app source
 COPY . .
 
-# Creates a "dist" folder with the production build
+# Generate prisma client
+RUN npx prisma generate
+
+# Build app, creates a "dist" folder with the production build
 RUN npm run build
 
 # Expose port
@@ -35,4 +32,4 @@ RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # Start the server using the production build
-CMD [ "node", "dist/src/main.js" ]
+CMD [ "npm", "start" ]

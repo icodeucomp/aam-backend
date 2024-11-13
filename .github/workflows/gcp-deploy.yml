@@ -1,4 +1,4 @@
-name: Deploy to Google App Engine
+name: Deploy to Cloud Run From Docker Hub
 
 on:
   push:
@@ -6,50 +6,33 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     environment: app-engine-config
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          ref: 'main'
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
         with:
-          node-version: '20'
-  
-      - name: Install dependencies
-        run: npm ci
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}:${{ github.sha }}
 
-      - name: Run Prisma Migrations
-        run: npx prisma migrate deploy
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
-
-      - name: Generate Prisma Client
-        run: npx prisma generate
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
-
-      - name: Build application
-        run: npm run build
-
-      - name: Debug Secrets
-        run: |
-          if [ -n "${{ secrets.DEFAULT_IMAGE }}" ]; then
-            echo "✓ DEFAULT_IMAGE is set"
-          else
-            echo "✗ DEFAULT_IMAGE is not set"
-          fi
-
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: app-engine-config
+    steps:
       - name: Google Cloud Auth
         uses: 'google-github-actions/auth@v2'
         with:
@@ -60,32 +43,39 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Create env.yaml
+      - name: Verify DATABASE_URL
         run: |
-          cat <<EOF > env.yaml
-          env_variables:
-            DEFAULT_IMAGE: "${{ secrets.DEFAULT_IMAGE }}"
-            DATABASE_URL: "${{ secrets.DATABASE_URL }}"
-            DIRECT_URL: "${{ secrets.DIRECT_URL }}"
-            JWT_AT_SECRET: "${{ secrets.JWT_AT_SECRET }}"
-            JWT_RT_SECRET: "${{ secrets.JWT_RT_SECRET }}"
-            JWT_AT_EXPIRE: "${{ secrets.JWT_AT_EXPIRE }}"
-            JWT_RT_EXPIRE: "${{ secrets.JWT_RT_EXPIRE }}"
-            REDIS_HOST: "${{ secrets.REDIS_HOST }}"
-            REDIS_PORT: "${{ secrets.REDIS_PORT }}"
-            REDIS_PASSWORD: "${{ secrets.REDIS_PASSWORD }}"
-            MAIL_HOST: "${{ secrets.MAIL_HOST }}"
-            MAIL_PORT: "${{ secrets.MAIL_PORT }}"
-            MAIL_SECURE: "${{ secrets.MAIL_SECURE }}"
-            MAIL_USER: "${{ secrets.MAIL_USER }}"
-            MAIL_PASSWORD: "${{ secrets.MAIL_PASSWORD }}"
-            MAIL_FROM: "${{ secrets.MAIL_FROM }}"
-            MAIL_NAME: "${{ secrets.MAIL_NAME }}"
-            CLOUDINARY_NAME: "${{ secrets.CLOUDINARY_NAME }}"
-            CLOUDINARY_API_KEY: "${{ secrets.CLOUDINARY_API_KEY }}"
-            CLOUDINARY_API_SECRET: "${{ secrets.CLOUDINARY_API_SECRET }}"
-          EOF
+          if [ -z "${{ secrets.DATABASE_URL }}" ]; then
+            echo "DATABASE_URL is not set in secrets"
+            exit 1
+          fi
+          echo "DATABASE_URL is properly set"
 
-      - name: Deploy to Google App Engine
-        run: |
-          gcloud app deploy app.yaml --quiet
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ vars.SERVICE_NAME }}
+          region: ${{ vars.REGION }}
+          image: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}:${{ github.sha }}
+          env_vars: |
+            DEFAULT_IMAGE=${{ secrets.DEFAULT_IMAGE }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            DIRECT_URL=${{ secrets.DIRECT_URL }}
+            JWT_AT_SECRET=${{ secrets.JWT_AT_SECRET }}
+            JWT_RT_SECRET=${{ secrets.JWT_RT_SECRET }}
+            JWT_AT_EXPIRE=${{ secrets.JWT_AT_EXPIRE }}
+            JWT_RT_EXPIRE=${{ secrets.JWT_RT_EXPIRE }}
+            REDIS_HOST=${{ secrets.REDIS_HOST }}
+            REDIS_PORT=${{ secrets.REDIS_PORT }}
+            REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}
+            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            MAIL_HOST=${{ secrets.MAIL_HOST }}
+            MAIL_PORT=${{ secrets.MAIL_PORT }}
+            MAIL_SECURE=${{ secrets.MAIL_SECURE }}
+            MAIL_USER=${{ secrets.MAIL_USER }}
+            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+            MAIL_FROM=${{ secrets.MAIL_FROM }}
+            MAIL_NAME=${{ secrets.MAIL_NAME }}
+            CLOUDINARY_NAME=${{ secrets.CLOUDINARY_NAME }}
+            CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+            CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
