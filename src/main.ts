@@ -11,7 +11,14 @@ async function bootstrap() {
   const port = config.get<number>('PORT') || 3000;
 
   app.setGlobalPrefix('/api/v1');
-  app.enableCors({ credentials: true });
+  app.enableCors({
+    origin: [
+      config.get<string>('FE_PRODUCTION'),
+      config.get<string>('FE_STAGING'),
+      config.get<string>('FE_DEVELOPMENT'),
+    ],
+    credentials: true,
+  });
   app.useLogger(new Logger());
 
   app.useGlobalPipes(

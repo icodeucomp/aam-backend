@@ -59,6 +59,9 @@ jobs:
           image: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}:${{ github.sha }}
           env_vars: |
             DEFAULT_IMAGE=${{ secrets.DEFAULT_IMAGE }}
+            FE_PRODUCTION=${{ secrets.FE_PRODUCTION }}
+            FE_STAGING=${{ secrets.FE_STAGING }}
+            FE_DEVELOPMENT=${{ secrets.FE_DEVELOPMENT }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             DIRECT_URL=${{ secrets.DIRECT_URL }}
             JWT_AT_SECRET=${{ secrets.JWT_AT_SECRET }}
