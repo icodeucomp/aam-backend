@@ -13,6 +13,8 @@ import {
 import * as fs from 'fs';
 import { ReadStream } from 'fs';
 
+import { cloudinaryRootFolder } from '@common/utils';
+
 @Injectable()
 export class CloudinaryService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(CloudinaryService.name);
@@ -41,7 +43,7 @@ export class CloudinaryService implements OnModuleInit, OnModuleDestroy {
       const upload = cloudinary.uploader.upload_stream(
         {
           public_id: file.filename,
-          folder: folder,
+          folder: `${cloudinaryRootFolder}/${folder}`,
           overwrite: true,
         },
         (error, result) => {

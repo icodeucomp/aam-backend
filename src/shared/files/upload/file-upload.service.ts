@@ -3,7 +3,6 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import * as fs from 'fs';
 
 import {
   BusinessSlug,
@@ -23,6 +22,65 @@ export class FileUploadService {
     type: MediaType,
     category: BusinessSlug | DocumentCategory | string,
   ): Promise<{ name: string; url: string; size: string }> {
+    this.validateUploadInput(file, type, category);
+
+    const folderName = this.getUploadFolderName(type, category);
+
+    const result = await this.cloudinaryService.uploadFile(file, folderName);
+
+    return {
+      name: result.public_id,
+      url: result.secure_url,
+      size: generateFileSize(file.size),
+    };
+  }
+
+  async uploadFiles(
+    files: Express.Multer.File[],
+    type: MediaType,
+    businessSlug: BusinessSlug,
+    businessType: BusinessType,
+    album: string,
+  ): Promise<{ uploadedFiles: { name: string; url: string; size: string }[] }> {
+    this.validateUploadsInput(files, type, businessSlug, businessType);
+
+    const folderName =
+      type === MediaType.Business
+        ? `${type}/${businessSlug}/${businessType}`
+        : `album/${album}/${type}`;
+
+    const uploadedFiles = await Promise.all(
+      files.map(async (file) => {
+        try {
+          const result = await this.cloudinaryService.uploadFile(
+            file,
+            folderName,
+          );
+
+          return {
+            name: result.public_id,
+            url: result.secure_url,
+            size: generateFileSize(file.size),
+          };
+        } catch (error) {
+          console.error(
+            `Error uploading file ${file.originalname}: ${error.message}`,
+          );
+          throw new InternalServerErrorException(
+            `Failed to upload file ${file.originalname}`,
+          );
+        }
+      }),
+    );
+
+    return { uploadedFiles };
+  }
+
+  private validateUploadInput(
+    file: Express.Multer.File,
+    type: MediaType,
+    category: BusinessSlug | DocumentCategory | string,
+  ): void {
     if (!file) {
       throw new BadRequestException('please input file');
     }
@@ -44,38 +102,16 @@ export class FileUploadService {
         `Upload failed, no document with category ${category}`,
       );
     }
-
-    const folderName =
-      type === MediaType.Business
-        ? `${type}/${category}/header`
-        : type === MediaType.Document
-          ? `${type}/${category.toLowerCase()}`
-          : type === MediaType.Album
-            ? `${type}/${category}/header`
-            : type === MediaType.Project
-              ? `business/${category}/${type}/header`
-              : `${type}`;
-
-    const result = await this.cloudinaryService.uploadFile(file, folderName);
-
-    return {
-      name: result.public_id,
-      url: result.secure_url,
-      size: generateFileSize(file.size),
-    };
   }
 
-  async uploadFiles(
+  private validateUploadsInput(
     files: Express.Multer.File[],
     type: MediaType,
-    businessSlug: BusinessSlug,
+    businessSlug: string,
     businessType: BusinessType,
-    album: string,
-  ): Promise<{ uploadedFiles: { name: string; url: string; size: string }[] }> {
-    const uploadedFiles = [];
-
-    if (!files) {
-      throw new BadRequestException('please input file');
+  ): void {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('Please input file(s)');
     }
 
     if (type !== MediaType.Business && type !== MediaType.Media) {
@@ -84,7 +120,7 @@ export class FileUploadService {
       );
     }
 
-    if (type == MediaType.Business) {
+    if (type === MediaType.Business) {
       if (!businessSlug) {
         throw new BadRequestException('Please input business name');
       }
@@ -92,41 +128,21 @@ export class FileUploadService {
         throw new BadRequestException('Please input business type');
       }
     }
+  }
 
-    const folderName =
-      type === MediaType.Business
-        ? `${type}/${businessSlug}/${businessType}`
-        : `album/${album}/${type}`;
-
-    for (const file of files) {
-      const fileStream = fs.createReadStream(file.path);
-
-      if (!fileStream) {
-        throw new BadRequestException('Failed to create file stream');
-      }
-
-      try {
-        const result = await this.cloudinaryService.uploadFile(
-          file,
-          folderName,
-        );
-
-        uploadedFiles.push({
-          name: result.public_id,
-          url: result.secure_url,
-          size: generateFileSize(file.size),
-        });
-      } catch (error) {
-        console.error({ error });
-        throw new InternalServerErrorException(
-          `Failed to upload file: ${error.message}`,
-        );
-      } finally {
-        fs.unlinkSync(file.path);
-      }
+  private getUploadFolderName(type: MediaType, category: string): string {
+    switch (type) {
+      case MediaType.Business:
+        return `${type}/${category}/header`;
+      case MediaType.Document:
+        return `${type}/${category.toLowerCase()}`;
+      case MediaType.Album:
+        return `${type}/${category}/header`;
+      case MediaType.Project:
+        return `business/${category}/${type}/header`;
+      default:
+        return type;
     }
-
-    return { uploadedFiles };
   }
 
   private isValidBusinessSlug(businessSlug: string): boolean {
