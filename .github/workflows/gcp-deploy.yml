@@ -57,6 +57,7 @@ jobs:
           service: ${{ vars.SERVICE_NAME }}
           region: ${{ vars.REGION }}
           image: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}:${{ github.sha }}
+          timeout: 900s
           env_vars: |
             DEFAULT_IMAGE=${{ secrets.DEFAULT_IMAGE }}
             FE_PRODUCTION=${{ secrets.FE_PRODUCTION }}
