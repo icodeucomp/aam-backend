@@ -70,7 +70,6 @@ jobs:
             JWT_RT_EXPIRE=${{ secrets.JWT_RT_EXPIRE }}
             REDIS_HOST=${{ secrets.REDIS_HOST }}
             REDIS_PORT=${{ secrets.REDIS_PORT }}
-            REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}
             REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
             MAIL_HOST=${{ secrets.MAIL_HOST }}
             MAIL_PORT=${{ secrets.MAIL_PORT }}
