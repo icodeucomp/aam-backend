@@ -48,19 +48,6 @@ export class SearchService {
       },
     });
 
-    const documents = await this.prisma.document.findMany({
-      where: {
-        name: { contains: name, mode: 'insensitive' },
-      },
-      include: {
-        uploader: {
-          select: {
-            username: true,
-          },
-        },
-      },
-    });
-
     const business = await this.prisma.business.findMany({
       where: {
         title: { contains: name, mode: 'insensitive' },
@@ -105,12 +92,6 @@ export class SearchService {
       author: blog.author.username,
     }));
 
-    const mappedDocuments: DocumentFeature[] = documents.map((document) => ({
-      feature: Feature.Document,
-      ...document,
-      uploader: document.uploader.username,
-    }));
-
     const mappedBusiness: BusinessFeature[] = business.map((business) => ({
       feature: Feature.Business,
       ...business,
@@ -131,7 +112,6 @@ export class SearchService {
     const features: Features[] = [
       ...mappedAlbums,
       ...mappedBlogs,
-      ...mappedDocuments,
       ...mappedBusiness,
       ...mappedProducts,
       ...mappedProjects,
